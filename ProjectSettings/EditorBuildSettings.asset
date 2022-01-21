@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Level 1.unity
+    guid: b57f8fa87bdc94b40bb95fc0111d246b
+  - enabled: 1
+    path: Assets/Scenes/Level 2.unity
+    guid: dd315e8c2b8e1b240a0ac029c99cf68e
+  - enabled: 1
+    path: Assets/Scenes/Level 2_2.unity
+    guid: 7f68a404350477a4eae8af627f70abbe
+  - enabled: 1
+    path: Assets/Scenes/Level 2_3.unity
+    guid: 5b75af8d08bdd3c4585afe80a1d880c1
+  - enabled: 1
+    path: Assets/Scenes/Level 3.unity
+    guid: 37803d8e4f5d3a64f9f36c1ef8b557d6
+  - enabled: 1
+    path: Assets/Scenes/Level 3_2.unity
+    guid: 66e98b4d6a8f595498d374414a70fb4b
+  - enabled: 1
+    path: Assets/Scenes/Level 3_3.unity
+    guid: 08972aaa5840f2d4789e2c7336a2067b
+  - enabled: 1
+    path: Assets/Scenes/Level 4.unity
+    guid: f673935c3403769438f8143a890039bd
+  - enabled: 1
+    path: Assets/Scenes/Level 4_2.unity
+    guid: 84cc2148b3f120749aff2fda6269fa7d
+  - enabled: 1
+    path: Assets/Scenes/Level 4_3.unity
+    guid: 28d32f109de155e49840f30d4a0491a7
+  - enabled: 1
+    path: Assets/Scenes/Level 5.unity
+    guid: b958d700cf359294db8760097f1fa6ac
+  - enabled: 1
+    path: Assets/Scenes/Level 5_2.unity
+    guid: dc090db2bb67a0243817e29e68b02428
+  - enabled: 1
+    path: Assets/Scenes/Level 5_3.unity
+    guid: 6bb3ab1d308bae142bec11d780df55dd
+  - enabled: 1
+    path: Assets/Scenes/Level 6.unity
+    guid: 7426c7f65c1e4b8409fd80574c88a33b
+  - enabled: 1
+    path: Assets/Scenes/Level 6_2.unity
+    guid: 9902ae04260f15440b239b80a4fca531
+  - enabled: 1
+    path: Assets/Scenes/Level 7.unity
+    guid: c4a77de44a87d9d42b4dc3504adf9dd9
+  - enabled: 1
+    path: Assets/Scenes/Level 7_2.unity
+    guid: 943e1d77a87abbf48be9df58deb35a31
+  - enabled: 1
+    path: Assets/Scenes/Level 8.unity
+    guid: 92f05a9dd4aaed94bb75ff8a9bdaae43
+  - enabled: 1
+    path: Assets/Scenes/Level 9.unity
+    guid: ddb3ad579064782468fcd53c20beb551
+  m_configObjects: {}
