@@ -1,9 +1,6 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Data.SqlTypes;
 using TMPro;
-using TMPro.EditorUtilities;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -45,10 +42,17 @@ public class Ball : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         TouchHandler();
         FuzzyHandle();
         
-        
+        if (IsCompleteLevel())
+        {
+            ChangeStateTo(GameState.COMPLETE); 
+        }else if (IsGameOver())
+        {
+            ChangeStateTo(GameState.GAMEOVER);
+        }
     }
     private void InitGame()
     {       
@@ -75,8 +79,11 @@ public class Ball : MonoBehaviour
         GameplayCanvas.enabled = false;
         StartGameCanvas.enabled = true;
         gameOverTrigger = false;
+        _gameState = GameState.START;
         //  isIngame = false;
     }
+   
+    
     
     private void FuzzyHandle()
     {
@@ -148,7 +155,7 @@ public class Ball : MonoBehaviour
         scoreText.text = "SCORE: " + score;
     }
     private bool IsTouch()
-    {
+    {    Debug.Log(_gameState.ToString());
         if (_delay > Mathf.Epsilon) return false;
         if (Input.touchCount > 0)
         {
@@ -238,18 +245,7 @@ public class Ball : MonoBehaviour
 
     private void Move()
     {
-        if (IsCompleteLevel())
-        {
-           ChangeStateTo(GameState.COMPLETE); 
-        }else if (IsGameOver())
-        {
-            ChangeStateTo(GameState.GAMEOVER);
-        }
-        else
-        {
-            transform.Translate(Vector3.down * speed * Time.smoothDeltaTime);
-        }
-        
+        transform.Translate(Vector3.down * speed * Time.smoothDeltaTime);
     }
 
     private void FloorPosition()
