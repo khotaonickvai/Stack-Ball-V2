@@ -317,7 +317,7 @@ public class Ball : MonoBehaviour
     private void NextLevel()
     {
         var index = SceneManager.GetActiveScene().buildIndex;
-        var scencecount = SceneManager.sceneCount;
+        var scencecount = SceneManager.sceneCountInBuildSettings;
         if (index == scencecount - 1)
         {
             SceneManager.LoadScene(0);
