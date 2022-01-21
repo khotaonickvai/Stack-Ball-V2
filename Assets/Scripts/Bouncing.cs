@@ -13,13 +13,14 @@ public class Bouncing : MonoBehaviour
     private Vector3 positionCatch;
     private ParticleSystem bouncingFx;
     private Ball ball;
-    
+    private bool bounTrigger;
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         positionCatch = new Vector3(transform.localScale.x,0, transform.localScale.z);
         bouncingFx = GetComponentsInChildren<ParticleSystem>()[0];
         ball = GetComponentInParent<Ball>();
+        bounTrigger = false;
     }
 
     // Start is called before the first frame update
@@ -31,7 +32,7 @@ public class Bouncing : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (IsTouch())
+        if (IsTouch() && bounTrigger)
         {
             DisableRigid();
             bouncingFx.Stop();
@@ -108,5 +109,10 @@ public class Bouncing : MonoBehaviour
             return true;
         }
         else return false;
+    }
+
+    public void SetBoundTrigger(bool trigger)
+    {
+        bounTrigger = trigger;
     }
 }

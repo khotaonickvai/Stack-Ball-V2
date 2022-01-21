@@ -26,6 +26,7 @@ public class Ball : MonoBehaviour
     private Canvas EndLevelCanvas;
     private bool gameOverTrigger;
     private float _delay = 0;
+    private Bouncing bouncing;
     private enum GameState{START,INGAME,GAMEOVER,COMPLETE}
 
     private GameState _gameState;
@@ -62,6 +63,7 @@ public class Ball : MonoBehaviour
         transform.position = new Vector3(transform.position.x, yStart, transform.position.z);
         fuzzySlider = GameObject.FindGameObjectWithTag("FuzzySlider").GetComponent<Slider>();
         fuzzySlider = GameObject.FindGameObjectWithTag("FuzzySlider").GetComponent<Slider>();
+        bouncing = FindObjectOfType<Bouncing>();
         isFuzzying = false;
         currentEnergy = 0;
         fuzzySlider.minValue = 0;
@@ -181,6 +183,7 @@ public class Ball : MonoBehaviour
                 break;
             case GameState.INGAME :
                 GameplayCanvas.enabled = false;
+                bouncing.SetBoundTrigger(false);
                 break;
             case GameState.COMPLETE :
                 break;
@@ -196,6 +199,7 @@ public class Ball : MonoBehaviour
                break;
            case GameState.INGAME :
                GameplayCanvas.enabled = true;
+               bouncing.SetBoundTrigger(true);
                break;
            case GameState.COMPLETE :
                EndLevelCanvas.enabled = true;
