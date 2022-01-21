@@ -6,9 +6,9 @@ using UnityEngine;
 public class Bouncing : MonoBehaviour
 {
     private Rigidbody rb;
-    private const float relativeVelocity = 12f;
+    private const float relativeVelocity = 20f;
     private const float lacalScaleRelative = 3f;
-    private float maxSpeed = 2;
+    private float maxSpeed = 5;
     public const float relativeLocalPosition = 1f;
     private Vector3 positionCatch;
     private ParticleSystem bouncingFx;
@@ -36,6 +36,7 @@ public class Bouncing : MonoBehaviour
         {
             DisableRigid();
             bouncingFx.Stop();
+            
             transform.localPosition = Vector3.up * relativeLocalPosition;
         }
         else

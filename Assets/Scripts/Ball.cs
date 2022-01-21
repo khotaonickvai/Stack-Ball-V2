@@ -7,12 +7,15 @@ using UnityEngine.UI;
 
 public class Ball : MonoBehaviour
 {
+    [SerializeField] private TextMeshProUGUI LevelText;
     [SerializeField] private int maxFuzzy;
     [SerializeField] private Color normalColor;
     [SerializeField] private Color fuzzyColor;
+    [SerializeField] private LevelsManager _levelsManager;
+    [SerializeField] private Slider LevelBar;
     private bool isFuzzying;
-    private Slider fuzzySlider;
-    private TextMeshProUGUI scoreText;
+    [SerializeField]private Slider fuzzySlider;
+    [SerializeField]private TextMeshProUGUI scoreText;
     private float currentEnergy;
     public const float speed = 10f;
     private GameObject Stacks;
@@ -20,30 +23,37 @@ public class Ball : MonoBehaviour
     [SerializeField] float energyPenaty = 10f;
     private int score;
     private ParticleSystem[] fireVFX;
-    private Canvas GameoverCanvas;
-    private Canvas StartGameCanvas;
-    private Canvas GameplayCanvas;
-    private Canvas EndLevelCanvas;
+    [SerializeField]private Canvas GameoverCanvas;
+    [SerializeField]private Canvas StartGameCanvas;
+    [SerializeField]private Canvas GameplayCanvas;
+    [SerializeField]private Canvas EndLevelCanvas;
     private bool gameOverTrigger;
     private float _delay = 0;
     private Bouncing bouncing;
+    private GameObject level;
     private enum GameState{START,INGAME,GAMEOVER,COMPLETE}
 
     private GameState _gameState;
+    
     private void Awake()
     {
-        Debug.Log("Class Ball Awalke");
+        
     }
     
     void Start()
     {
-       InitGame();
+       //InitGame();
+       NewInitGame();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        // de bug 
+        if (Input.GetKeyDown(KeyCode.N))
+        {
+            NextLevel();
+        }
         TouchHandler();
         FuzzyHandle();
         
@@ -55,14 +65,9 @@ public class Ball : MonoBehaviour
             ChangeStateTo(GameState.GAMEOVER);
         }
     }
-    private void InitGame()
-    {       
 
-        Stacks = GameObject.FindGameObjectWithTag("Stacks");
-        int yStart = Stacks.GetComponent<Stacks>().GetListCount() - 1;
-        transform.position = new Vector3(transform.position.x, yStart, transform.position.z);
-        fuzzySlider = GameObject.FindGameObjectWithTag("FuzzySlider").GetComponent<Slider>();
-        fuzzySlider = GameObject.FindGameObjectWithTag("FuzzySlider").GetComponent<Slider>();
+    private void NewInitGame()
+    {
         bouncing = FindObjectOfType<Bouncing>();
         isFuzzying = false;
         currentEnergy = 0;
@@ -71,20 +76,17 @@ public class Ball : MonoBehaviour
         mat = GetComponentInChildren<Renderer>().material;
         fireVFX = GetComponentsInChildren<ParticleSystem>();
         score = 0;
-        scoreText = GameObject.FindGameObjectWithTag("ScoreText").GetComponent<TextMeshProUGUI>();
-        GameoverCanvas = GameObject.FindGameObjectWithTag("GameoverCanvas").GetComponent<Canvas>();
-        GameplayCanvas = GameObject.FindWithTag("GameplayCanvas").GetComponent<Canvas>();
-        StartGameCanvas = GameObject.FindWithTag("StartGameCanvas").GetComponent<Canvas>();
-        EndLevelCanvas = GameObject.FindWithTag("EndLevelCanvas").GetComponent<Canvas>();
         AddScore(0);
         GameoverCanvas.enabled = false;
         GameplayCanvas.enabled = false;
         StartGameCanvas.enabled = true;
         gameOverTrigger = false;
         _gameState = GameState.START;
-        //  isIngame = false;
+        level = Instantiate(_levelsManager.GetLevelGameObjectPrefab(0), Vector3.zero, Quaternion.identity);
+        Stacks = level.GetComponent<LevelMap>().Stacks;
+        int yStart = Stacks.GetComponent<Stacks>().GetListCount() - 1;
+        transform.position = new Vector3(transform.position.x, yStart, transform.position.z);
     }
-   
     
     
     private void FuzzyHandle()
@@ -157,7 +159,7 @@ public class Ball : MonoBehaviour
         scoreText.text = "SCORE: " + score;
     }
     private bool IsTouch()
-    {    Debug.Log(_gameState.ToString());
+    {   // Debug.Log(_gameState.ToString());
         if (_delay > Mathf.Epsilon) return false;
         if (Input.touchCount > 0)
         {
@@ -184,10 +186,14 @@ public class Ball : MonoBehaviour
             case GameState.INGAME :
                 GameplayCanvas.enabled = false;
                 bouncing.SetBoundTrigger(false);
+                
                 break;
             case GameState.COMPLETE :
+                EndLevelCanvas.enabled = false;
                 break;
             case GameState.GAMEOVER :
+                GameoverCanvas.enabled = false;
+                gameOverTrigger = false;
                 break;
         }
         // begin new state
@@ -200,6 +206,7 @@ public class Ball : MonoBehaviour
            case GameState.INGAME :
                GameplayCanvas.enabled = true;
                bouncing.SetBoundTrigger(true);
+               LevelText.text = "Level: " + ( _levelsManager.GetCurrentLevelIndex() + 1 );
                break;
            case GameState.COMPLETE :
                EndLevelCanvas.enabled = true;
@@ -251,50 +258,11 @@ public class Ball : MonoBehaviour
     {
         transform.Translate(Vector3.down * speed * Time.smoothDeltaTime);
     }
-
     private void FloorPosition()
     {
         var position = transform.position;
         transform.position = new Vector3(position.x, Mathf.FloorToInt(position.y),position.z);
     }
-    
-    /*private void move()
-    {
-        
-       
-        if (IsTouch())
-        {
-            if (!isIngame)
-            {
-                if (GameoverCanvas.enabled)
-                {
-
-                    var scensse =  SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex,LoadSceneMode.Additive);
-                    scensse.allowSceneActivation = false;
-                 
-                }
-                else
-                {
-                    StartCoroutine(PlayGame());
-                    return;
-                }
-                
-            }
-            
-            transform.Translate(Vector3.down * speed * Time.smoothDeltaTime);
-            
-        }
-        else
-        {
-            transform.position = new Vector3(transform.position.x, Mathf.FloorToInt(transform.position.y),
-                transform.position.z);
-            if (currentEnergy >= Mathf.Epsilon)
-            {
-                currentEnergy -= energyPenaty * Time.deltaTime;
-            }
-           
-        }
-    }*/
     private bool IsCompleteLevel()
     {
         if (transform.position.y < 0)
@@ -316,30 +284,49 @@ public class Ball : MonoBehaviour
     }
     private void NextLevel()
     {
-        var index = SceneManager.GetActiveScene().buildIndex;
-        var scencecount = SceneManager.sceneCountInBuildSettings;
-        if (index == scencecount - 1)
-        {
-            SceneManager.LoadScene(0);
-        }
-        else
-        {
-            SceneManager.LoadScene(index + 1);
-        }
+        ResetFuzzy();
+        
+        ChangeStateTo(GameState.START);
+        Destroy(level);
+       // level = new GameObject();
+        level = Instantiate(_levelsManager.LoadNextLevel(),Vector3.zero, Quaternion.identity);
+        Stacks = level.GetComponent<LevelMap>().Stacks;
+        int yStart = Stacks.GetComponent<Stacks>().GetListCount() - 1;
+        transform.position = new Vector3(transform.position.x, yStart, transform.position.z);
+     //   Debug.Log(Stacks.gameObject.name);
+        gameOverTrigger = false;
+        ChangeStateTo(GameState.START);
         
     }
 
+    private void ResetFuzzy()
+    {
+        isFuzzying = false;
+        currentEnergy = 0;
+        fuzzySlider.minValue = 0;
+        fuzzySlider.maxValue = maxFuzzy;
+    }
     private void ReloadLevel()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        Destroy(level);
+        //level = new GameObject();
+        ResetFuzzy();
+        ChangeStateTo(GameState.START);
+        level = new GameObject();
+        level = Instantiate(_levelsManager.ReloadLevel(),Vector3.zero, Quaternion.identity);
+        Stacks = level.GetComponent<LevelMap>().Stacks;
+        int yStart = Stacks.GetComponent<Stacks>().GetListCount() - 1;
+        transform.position = new Vector3(transform.position.x, yStart, transform.position.z);
+        //   Debug.Log(Stacks.gameObject.name);
+        gameOverTrigger = false;
+        ChangeStateTo(GameState.START);
+        
     }
-
     private void BlockTouch(float timeToBlock)
     {
         _delay = timeToBlock;
         StartCoroutine(Delay());
     }
-
     private IEnumerator Delay()
     {
         yield return new WaitForSeconds(_delay);
@@ -349,6 +336,5 @@ public class Ball : MonoBehaviour
     {
         gameOverTrigger = true;
     }
-    
     
 }

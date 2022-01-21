@@ -47,7 +47,6 @@ GameObject:
   - component: {fileID: 898583191}
   - component: {fileID: 898583193}
   - component: {fileID: 898583192}
-  - component: {fileID: 8547562413219386856}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -171,18 +170,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &8547562413219386856
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 898583190}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff91c9a63aae1ea4f90fcb27cacaab84, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1549741048
 GameObject:
   m_ObjectHideFlags: 0
@@ -571,7 +558,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7319474071638087346}
   - component: {fileID: 3736241041361973982}
-  - component: {fileID: 3158275038221898739}
   m_Layer: 5
   m_Name: Level Bar
   m_TagString: Untagged
@@ -651,19 +637,6 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &3158275038221898739
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6004929232662993218}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bbfa956a0d94ff9498f628f54e85d652, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  slider: {fileID: 3736241041361973982}
 --- !u!1 &6121928521428422541
 GameObject:
   m_ObjectHideFlags: 0

@@ -13,18 +13,19 @@ public class Factor : MonoBehaviour
     private Rigidbody rb;
     private const float timeToDestroy = 1.5f;
     private Ball ballClass;
-    
+    private const int RennderRange = 8;
+    private Renderer _renderer;
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         DisableRigid();
         ball = GameObject.FindGameObjectWithTag("Ball");
         ballClass = ball.GetComponent<Ball>();
-        
+        _renderer = GetComponentInChildren<Renderer>();
     }
     void Start()
     {
-        
+        _renderer.enabled = false;
        
     }
 
@@ -32,6 +33,14 @@ public class Factor : MonoBehaviour
     void Update()
     {
 
+        if (GetRennderCondition())
+        {
+            _renderer.enabled = true;
+        }
+        else
+        {
+            _renderer.enabled = false;
+        }
         CheckOnColider();
             
         
@@ -82,7 +91,7 @@ public class Factor : MonoBehaviour
         EnableRigidbody();
         rb.velocity = Vector3.up * relativeForceEx;
         rb.AddRelativeForce(new Vector3(100,100,100));
-        Destroy(gameObject, timeToDestroy);
+        //Destroy(gameObject, timeToDestroy);
         //transform.position = Vector3.up * 5;
     }
     private void EnableRigidbody()
@@ -117,5 +126,17 @@ public class Factor : MonoBehaviour
     private bool CheckUnder()
     {
         return ball.transform.position.y < transform.position.y;
+    }
+
+    private bool GetRennderCondition()
+    {
+        var position = transform.position.y;
+        var ballPosition = ball.transform.position.y;
+        if (Mathf.Abs(position - ballPosition) < RennderRange )
+        {
+            return true;
+        }
+
+        return false;
     }
 }
