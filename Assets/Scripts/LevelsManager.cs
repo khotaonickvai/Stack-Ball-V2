@@ -5,31 +5,22 @@ using UnityEngine;
 
 public class LevelsManager : MonoBehaviour
 {
-    private const int LevelsCount = 4;
-    
-    private int currentLevelIndex;
-    private const string lv1 = "Map_1";
-    private const string lv2 = "Map_1 3";
-    private const string lv3 = "Map_1 2";
-    private const string lv4 = "Map_1 1";
+    private const int LevelsCount = 18;
 
+    private int currentLevelIndex;
+    private readonly string[] levelStrings =
+    {
+        "Map_1","Map_1 3","Map_1 2","Map_1 1","Map_3","Map_3 1","Map_3 2",
+        "Map_4", "Map_4 1","Map_4 2","Map_5","Map_5 1","Map_5 2",
+        "Map_6","Map_6 1","Map_7","Map_7 1","Map_8", "Map_9","Map_10"
+    };
     private void Awake()
     {
         currentLevelIndex = 0;
     }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        //Instantiate(GetLevelGameObjectPrefab(0),transform.position + Vector3.forward * 3,Quaternion.identity);
-    }
-    // Update is called once per frame
-    void Update()
-    {
-    }
     public GameObject GetLevelGameObjectPrefab(int levelIndex)
     {
-        switch (levelIndex)
+        /*switch (levelIndex)
         {
             case 0 :
                 return Load(lv1);
@@ -39,8 +30,8 @@ public class LevelsManager : MonoBehaviour
                 return Load(lv3);
             case 3 :
                 return Load(lv4);
-        }
-        return null;
+        }*/
+        return Load(levelStrings[levelIndex]);
     }
 
     private GameObject Load(string path)
@@ -60,7 +51,6 @@ public class LevelsManager : MonoBehaviour
         }
 
         currentLevelIndex += 1;
-        Debug.Log(currentLevelIndex);
         return GetLevelGameObjectPrefab(currentLevelIndex);
     }
 
@@ -71,6 +61,22 @@ public class LevelsManager : MonoBehaviour
 
     public int GetCurrentLevelIndex()
     {
-        return currentLevelIndex;
+
+        try
+        {
+            currentLevelIndex = PlayerPrefs.GetInt("Current Level", currentLevelIndex);
+            return currentLevelIndex;
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e.Message);
+            return 0;
+        }
     }
+
+    public void SaveCurrentLevelIndex()
+    {
+        PlayerPrefs.SetInt("Current Level",currentLevelIndex);
+    }
+    
 }

@@ -7,7 +7,7 @@ public class Bouncing : MonoBehaviour
 {
     private Rigidbody rb;
     private const float relativeVelocity = 20f;
-    private const float lacalScaleRelative = 3f;
+    public const float lacalScaleRelative = 3f;
     private float maxSpeed = 5;
     public const float relativeLocalPosition = 1f;
     private Vector3 positionCatch;
@@ -22,13 +22,7 @@ public class Bouncing : MonoBehaviour
         ball = GetComponentInParent<Ball>();
         bounTrigger = false;
     }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
+    
     // Update is called once per frame
     void Update()
     {
@@ -36,7 +30,6 @@ public class Bouncing : MonoBehaviour
         {
             DisableRigid();
             bouncingFx.Stop();
-            
             transform.localPosition = Vector3.up * relativeLocalPosition;
         }
         else

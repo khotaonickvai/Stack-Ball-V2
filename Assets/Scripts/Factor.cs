@@ -7,6 +7,8 @@ public class Factor : MonoBehaviour
     [SerializeField] private bool destroyable;
     [SerializeField] private float angle;
     [SerializeField] private int scoreGain;
+    private Vector3 scaleTouch;
+    private Vector3 defaultScale;
     private bool touched;
     private GameObject ball;
     private const float relativeForceEx = 15f;
@@ -15,13 +17,26 @@ public class Factor : MonoBehaviour
     private Ball ballClass;
     private const int RennderRange = 8;
     private Renderer _renderer;
+    private bool firestTouch;
+    public bool canExplore;
     private void Awake()
     {
+        defaultScale = transform.parent.localScale;
+        scaleTouch = new Vector3(1.5f, 0.8f, 1.5f);
+        if (destroyable)
+        {
+            canExplore = true;
+        }
+        else
+        {
+            canExplore = false;
+        }
         rb = GetComponent<Rigidbody>();
         DisableRigid();
         ball = GameObject.FindGameObjectWithTag("Ball");
         ballClass = ball.GetComponent<Ball>();
         _renderer = GetComponentInChildren<Renderer>();
+        
     }
     void Start()
     {
@@ -41,6 +56,8 @@ public class Factor : MonoBehaviour
         {
             _renderer.enabled = false;
         }
+
+       
         CheckOnColider();
             
         
@@ -50,23 +67,28 @@ public class Factor : MonoBehaviour
         if (touched) return;
         if(CheckTouch())
         {
-            touched = true;
+            
             if (destroyable||ballClass.IsFuzzying())
             {
+                touched = true;
                 Explode();
                 ballClass.AddScore(scoreGain);
                 return;
             }else
             {
+                touched = true;
                 Gameover();
                 ballClass.SetGameOverTrigger();
-               // ballClass.SetGameOver();
-                
             }
             ballClass.AddEnergy();
             
         }
         if (CheckUnder())
+        {
+            StartCoroutine(ScaleTouchAnim());
+        }
+
+        if (CheckCanExplore())
         {
             touched = true;
             Explode();
@@ -76,8 +98,7 @@ public class Factor : MonoBehaviour
                 return;
             }
             
-            ballClass.AddEnergy();
-            
+            ballClass.AddEnergy(); 
         }
     }
 
@@ -91,43 +112,34 @@ public class Factor : MonoBehaviour
         EnableRigidbody();
         rb.velocity = Vector3.up * relativeForceEx;
         rb.AddRelativeForce(new Vector3(100,100,100));
-        //Destroy(gameObject, timeToDestroy);
-        //transform.position = Vector3.up * 5;
     }
     private void EnableRigidbody()
     {
-        //rb.useGravity = true;
         rb.constraints = RigidbodyConstraints.None;
     }
     private void DisableRigid()
     {
-       // rb.useGravity = false;
         rb.constraints = RigidbodyConstraints.FreezeAll;
     }
     private bool CheckTouch()
     {
-        // Debug.Log(transform.rotation.eulerAngles.y); 
         float eulerY = transform.eulerAngles.y;
-        //if(eulerY >= 360 - angle/2)
-        /*if (eulerY > 180)
-        {
-            eulerY -= 180;
-        }*/
         float anpha = eulerY - angle / 2;
         float beta = eulerY + angle / 2;
-        // Debug.Log(anpha);
-       // Debug.Log("stacks :" + stacks.transform.rotation.eulerAngles.y);
-        //return ball.transform.position.y < transform.position.y;
-        return (CheckUnder())
-                &&
-                (((anpha < 0)||(eulerY >= 360 - angle/2))&& beta > 0);
+        return (CheckCanExplore())
+               &&
+               (((anpha < 0)||(eulerY >= 360 - angle/2))&& beta > 0);
     }
 
     private bool CheckUnder()
     {
-        return ball.transform.position.y < transform.position.y;
+        return ball.transform.position.y < transform.position.y ;
     }
 
+    private bool CheckCanExplore()
+    {
+        return ball.transform.position.y < transform.position.y - 0.5;
+    }
     private bool GetRennderCondition()
     {
         var position = transform.position.y;
@@ -138,5 +150,39 @@ public class Factor : MonoBehaviour
         }
 
         return false;
+    }
+
+    public bool IsDestroyable()
+    {
+        return destroyable;
+    }
+
+    private IEnumerator ScaleTouchAnim()
+    {
+        bool endAnim = false;
+        bool maxSized = false;
+        var parentTranform = transform.parent;
+        while (!endAnim)
+        {
+            if (Mathf.Abs(scaleTouch.magnitude - transform.parent.localScale.magnitude) <= Mathf.Epsilon)
+            {
+                maxSized = true;
+            }
+            if (!maxSized)
+            {
+                transform.parent.localScale = Vector3.Lerp(defaultScale,scaleTouch,0.01f);
+            }
+            else
+            {
+                if (Mathf.Abs(defaultScale.magnitude - transform.parent.localScale.magnitude) <= Mathf.Epsilon)
+                {
+                    endAnim = true;
+                }
+                transform.parent.localScale = Vector3.Lerp(scaleTouch,defaultScale,0.01f );
+            }
+           
+            yield return new WaitForSeconds(0.5f);
+        }
+        
     }
 }

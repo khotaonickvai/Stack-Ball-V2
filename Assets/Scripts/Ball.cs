@@ -33,6 +33,7 @@ public class Ball : MonoBehaviour
     private GameObject level;
     private enum GameState{START,INGAME,GAMEOVER,COMPLETE}
 
+    private GameObject Bound;
     private GameState _gameState;
     
     private void Awake()
@@ -56,7 +57,7 @@ public class Ball : MonoBehaviour
         }
         TouchHandler();
         FuzzyHandle();
-        
+        SetLevelBarSlider();
         if (IsCompleteLevel())
         {
             ChangeStateTo(GameState.COMPLETE); 
@@ -69,6 +70,7 @@ public class Ball : MonoBehaviour
     private void NewInitGame()
     {
         bouncing = FindObjectOfType<Bouncing>();
+        Bound = bouncing.gameObject;
         isFuzzying = false;
         currentEnergy = 0;
         fuzzySlider.minValue = 0;
@@ -82,10 +84,13 @@ public class Ball : MonoBehaviour
         StartGameCanvas.enabled = true;
         gameOverTrigger = false;
         _gameState = GameState.START;
-        level = Instantiate(_levelsManager.GetLevelGameObjectPrefab(0), Vector3.zero, Quaternion.identity);
+        level = Instantiate(_levelsManager.GetLevelGameObjectPrefab(_levelsManager.GetCurrentLevelIndex()), Vector3.zero, Quaternion.identity);
         Stacks = level.GetComponent<LevelMap>().Stacks;
-        int yStart = Stacks.GetComponent<Stacks>().GetListCount() - 1;
+        var stacksCount = Stacks.GetComponent<Stacks>().GetListCount();
+        int yStart = stacksCount - 1;
         transform.position = new Vector3(transform.position.x, yStart, transform.position.z);
+        LevelBar.minValue = 0;
+        LevelBar.maxValue = stacksCount;
     }
     
     
@@ -159,7 +164,7 @@ public class Ball : MonoBehaviour
         scoreText.text = "SCORE: " + score;
     }
     private bool IsTouch()
-    {   // Debug.Log(_gameState.ToString());
+    {   
         if (_delay > Mathf.Epsilon) return false;
         if (Input.touchCount > 0)
         {
@@ -256,12 +261,34 @@ public class Ball : MonoBehaviour
 
     private void Move()
     {
-        transform.Translate(Vector3.down * speed * Time.smoothDeltaTime);
+        var boundPosition = Bound.transform.localPosition;
+        if (boundPosition.y > Bouncing.lacalScaleRelative)
+        {
+            Bound.transform.localPosition += Vector3.down * 10f;
+        }
+        else
+        {
+            transform.Translate(Vector3.down * speed * Time.smoothDeltaTime);
+        }
+       
     }
     private void FloorPosition()
     {
         var position = transform.position;
-        transform.position = new Vector3(position.x, Mathf.FloorToInt(position.y),position.z);
+        var floor = Mathf.FloorToInt(position.y);
+        if (floor <= 1)
+        {
+            transform.position = new Vector3(position.x, Mathf.FloorToInt(position.y),position.z);
+            return;
+        }
+        if (position.y - floor >= 0.5)
+        {
+            transform.position = new Vector3(position.x, Mathf.CeilToInt(position.y),position.z);
+        }
+        else
+        {
+            transform.position = new Vector3(position.x, Mathf.FloorToInt(position.y),position.z);
+        }
     }
     private bool IsCompleteLevel()
     {
@@ -288,15 +315,16 @@ public class Ball : MonoBehaviour
         
         ChangeStateTo(GameState.START);
         Destroy(level);
-       // level = new GameObject();
         level = Instantiate(_levelsManager.LoadNextLevel(),Vector3.zero, Quaternion.identity);
         Stacks = level.GetComponent<LevelMap>().Stacks;
-        int yStart = Stacks.GetComponent<Stacks>().GetListCount() - 1;
+        var stacksCount = Stacks.GetComponent<Stacks>().GetListCount();
+        int yStart = stacksCount  - 1;
         transform.position = new Vector3(transform.position.x, yStart, transform.position.z);
-     //   Debug.Log(Stacks.gameObject.name);
         gameOverTrigger = false;
         ChangeStateTo(GameState.START);
-        
+        LevelBar.minValue = 0;
+        LevelBar.maxValue = stacksCount;
+        _levelsManager.SaveCurrentLevelIndex();
     }
 
     private void ResetFuzzy()
@@ -309,18 +337,17 @@ public class Ball : MonoBehaviour
     private void ReloadLevel()
     {
         Destroy(level);
-        //level = new GameObject();
         ResetFuzzy();
         ChangeStateTo(GameState.START);
-        level = new GameObject();
         level = Instantiate(_levelsManager.ReloadLevel(),Vector3.zero, Quaternion.identity);
         Stacks = level.GetComponent<LevelMap>().Stacks;
-        int yStart = Stacks.GetComponent<Stacks>().GetListCount() - 1;
+        var stacksCount = Stacks.GetComponent<Stacks>().GetListCount();
+        int yStart = stacksCount - 1;
         transform.position = new Vector3(transform.position.x, yStart, transform.position.z);
-        //   Debug.Log(Stacks.gameObject.name);
         gameOverTrigger = false;
         ChangeStateTo(GameState.START);
-        
+        LevelBar.minValue = 0;
+        LevelBar.maxValue = stacksCount;
     }
     private void BlockTouch(float timeToBlock)
     {
@@ -336,5 +363,9 @@ public class Ball : MonoBehaviour
     {
         gameOverTrigger = true;
     }
-    
+
+    private void SetLevelBarSlider()
+    {
+        LevelBar.value = LevelBar.maxValue - transform.position.y;
+    }
 }
